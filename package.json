@@ -1,5 +1,5 @@
 {
-  "name": "tanstack-cloudflare-template",
+  "name": "tanstack-image-uploader",
   "private": true,
   "type": "module",
   "scripts": {
