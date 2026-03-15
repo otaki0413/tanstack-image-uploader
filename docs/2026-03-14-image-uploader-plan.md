@@ -175,23 +175,19 @@ import { getRequestHeaders } from "@tanstack/react-start/server";
 
 import { createAuth } from "@/lib/auth";
 
-export const getSession = createServerFn({ method: "GET" }).handler(
-  async () => {
-    const auth = createAuth();
-    const headers = getRequestHeaders();
-    return auth.api.getSession({ headers });
-  },
-);
+export const getSession = createServerFn({ method: "GET" }).handler(async () => {
+  const auth = createAuth();
+  const headers = getRequestHeaders();
+  return auth.api.getSession({ headers });
+});
 
-export const ensureSession = createServerFn({ method: "GET" }).handler(
-  async () => {
-    const auth = createAuth();
-    const headers = getRequestHeaders();
-    const session = await auth.api.getSession({ headers });
-    if (!session) throw new Error("Unauthorized");
-    return session;
-  },
-);
+export const ensureSession = createServerFn({ method: "GET" }).handler(async () => {
+  const auth = createAuth();
+  const headers = getRequestHeaders();
+  const session = await auth.api.getSession({ headers });
+  if (!session) throw new Error("Unauthorized");
+  return session;
+});
 ```
 
 - [ ] **Step 4: `src/routes/api/auth.$.ts` を作成**
@@ -324,12 +320,10 @@ export async function listImagesHandler({ db }: { db: Database }) {
   return db.select().from(images).orderBy(desc(images.createdAt)).limit(50);
 }
 
-export const listImages = createServerFn({ method: "GET" }).handler(
-  async () => {
-    const db = getDb();
-    return listImagesHandler({ db });
-  },
-);
+export const listImages = createServerFn({ method: "GET" }).handler(async () => {
+  const db = getDb();
+  return listImagesHandler({ db });
+});
 ```
 
 - [ ] **Step 4: テストを実行してパスを確認**
@@ -418,13 +412,7 @@ import { createServerFn } from "@tanstack/react-start";
 import { getDb, type Database } from "@/lib/drizzle/db";
 import { images } from "@/lib/drizzle/schema";
 
-export async function getImageHandler({
-  db,
-  imageId,
-}: {
-  db: Database;
-  imageId: string;
-}) {
+export async function getImageHandler({ db, imageId }: { db: Database; imageId: string }) {
   const rows = await db.select().from(images).where(eq(images.id, imageId));
   return rows[0] ?? null;
 }
@@ -663,14 +651,24 @@ describe("deleteImageHandler", () => {
   it("throws when image not found", async () => {
     const mockDb = createMockDb([]);
     await expect(
-      deleteImageHandler({ db: mockDb as any, bucket: mockBucket, userId: "user1", imageId: "nonexistent" }),
+      deleteImageHandler({
+        db: mockDb as any,
+        bucket: mockBucket,
+        userId: "user1",
+        imageId: "nonexistent",
+      }),
     ).rejects.toThrow("Not found");
   });
 
   it("throws when user does not own the image", async () => {
     const mockDb = createMockDb([existingImage]);
     await expect(
-      deleteImageHandler({ db: mockDb as any, bucket: mockBucket, userId: "other-user", imageId: "img1" }),
+      deleteImageHandler({
+        db: mockDb as any,
+        bucket: mockBucket,
+        userId: "other-user",
+        imageId: "img1",
+      }),
     ).rejects.toThrow("Forbidden");
   });
 
@@ -692,7 +690,12 @@ describe("deleteImageHandler", () => {
       callOrder.push("r2");
     });
 
-    await deleteImageHandler({ db: mockDb as any, bucket: mockBucket, userId: "user1", imageId: "img1" });
+    await deleteImageHandler({
+      db: mockDb as any,
+      bucket: mockBucket,
+      userId: "user1",
+      imageId: "img1",
+    });
 
     expect(callOrder).toEqual(["d1", "r2"]);
     expect(mockDelete).toHaveBeenCalledWith(existingImage.r2Key);
@@ -851,12 +854,7 @@ git commit -m "feat: add image delivery endpoint"
 - [ ] **Step 1: `src/routes/__root.tsx` をファイル全体を以下に置き換える**
 
 ```tsx
-import {
-  HeadContent,
-  Link,
-  Scripts,
-  createRootRoute,
-} from "@tanstack/react-router";
+import { HeadContent, Link, Scripts, createRootRoute } from "@tanstack/react-router";
 import { TanStackRouterDevtools } from "@tanstack/react-router-devtools";
 
 import { authClient } from "@/lib/auth/auth-client";
@@ -903,9 +901,7 @@ function Header() {
         ) : (
           <button
             type="button"
-            onClick={() =>
-              authClient.signIn.social({ provider: "google", callbackURL: "/" })
-            }
+            onClick={() => authClient.signIn.social({ provider: "google", callbackURL: "/" })}
             className="hover:underline"
           >
             Sign in with Google
@@ -998,11 +994,7 @@ function Gallery() {
   return (
     <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-4">
       {images.map((image) => (
-        <Link
-          key={image.id}
-          to="/images/$imageId"
-          params={{ imageId: image.id }}
-        >
+        <Link key={image.id} to="/images/$imageId" params={{ imageId: image.id }}>
           <img
             src={`/api/images/${image.id}/file`}
             alt={image.filename}
@@ -1054,9 +1046,7 @@ function UploadPage() {
 
   async function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault();
-    const input = e.currentTarget.elements.namedItem(
-      "file",
-    ) as HTMLInputElement;
+    const input = e.currentTarget.elements.namedItem("file") as HTMLInputElement;
     const file = input.files?.[0];
     if (!file) return;
 
@@ -1070,9 +1060,7 @@ function UploadPage() {
       router.navigate({ to: "/" });
     } catch (err) {
       setStatus("error");
-      setError(
-        err instanceof Error ? err.message : "アップロードに失敗しました",
-      );
+      setError(err instanceof Error ? err.message : "アップロードに失敗しました");
     }
   }
 
@@ -1119,12 +1107,7 @@ git commit -m "feat: add upload page with auth guard"
 - [ ] **Step 1: `src/routes/images/$imageId.tsx` を作成**
 
 ```tsx
-import {
-  Link,
-  createFileRoute,
-  notFound,
-  useRouter,
-} from "@tanstack/react-router";
+import { Link, createFileRoute, notFound, useRouter } from "@tanstack/react-router";
 
 import { authClient } from "@/lib/auth/auth-client";
 import { deleteImage } from "@/lib/functions/deleteImage";

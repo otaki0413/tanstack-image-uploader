@@ -10,15 +10,15 @@
 
 ## 技術スタック
 
-| 用途           | 技術                                |
-| -------------- | ----------------------------------- |
-| フレームワーク | TanStack Start (React 19)           |
-| デプロイ       | Cloudflare Workers                  |
-| 認証           | BetterAuth（Google OAuth）          |
+| 用途           | 技術                                 |
+| -------------- | ------------------------------------ |
+| フレームワーク | TanStack Start (React 19)            |
+| デプロイ       | Cloudflare Workers                   |
+| 認証           | BetterAuth（Google OAuth）           |
 | データベース   | Cloudflare D1（SQLite）+ Drizzle ORM |
-| 画像ストレージ | Cloudflare R2                       |
-| スタイリング   | Tailwind CSS v4                     |
-| テスト         | Vitest                              |
+| 画像ストレージ | Cloudflare R2                        |
+| スタイリング   | Tailwind CSS v4                      |
+| テスト         | Vitest                               |
 
 ## アーキテクチャ
 
@@ -231,12 +231,12 @@ createServerFn wrapper
 
 ### 関数一覧
 
-| 関数 | ハンドラーの型 | 認証 |
-| --- | --- | --- |
-| `listImages` | `({ db }) => ImageRecord[]`（最大 50 件、新着順） | 不要 |
-| `getImage` | `({ db, imageId }) => ImageRecord \| null` | 不要 |
-| `uploadImage` | `({ db, bucket, userId, file }) => { id }` | 必須 |
-| `deleteImage` | `({ db, bucket, userId, imageId }) => void` | 必須（所有者のみ） |
+| 関数          | ハンドラーの型                                    | 認証               |
+| ------------- | ------------------------------------------------- | ------------------ |
+| `listImages`  | `({ db }) => ImageRecord[]`（最大 50 件、新着順） | 不要               |
+| `getImage`    | `({ db, imageId }) => ImageRecord \| null`        | 不要               |
+| `uploadImage` | `({ db, bucket, userId, file }) => { id }`        | 必須               |
+| `deleteImage` | `({ db, bucket, userId, imageId }) => void`       | 必須（所有者のみ） |
 
 ### バリデーション（アップロード時）
 
@@ -260,7 +260,7 @@ createServerFn wrapper
 
 ```ts
 // テスト例
-const mockDb = { select: vi.fn().mockReturnThis(), /* ... */ };
+const mockDb = { select: vi.fn().mockReturnThis() /* ... */ };
 const result = await listImagesHandler({ db: mockDb as any });
 ```
 
@@ -322,14 +322,14 @@ src/
 
 ### 変更対象ファイル（既存）
 
-| ファイル | 変更内容 |
-| --- | --- |
-| `src/lib/auth.ts` | singleton → `createAuth()` ファクトリー + `tanstackStartCookies` + Google OAuth |
-| `src/lib/auth/auth-client.ts` | `authClient` を named export に追加 |
-| `src/lib/drizzle/db.ts` | placeholder → `getDb()` ヘルパー |
-| `src/lib/drizzle/schema.ts` | `images` テーブル追加 |
-| `src/routes/__root.tsx` | Header コンポーネント追加（認証 UI） |
-| `src/routes/index.tsx` | ギャラリー実装 |
+| ファイル                      | 変更内容                                                                        |
+| ----------------------------- | ------------------------------------------------------------------------------- |
+| `src/lib/auth.ts`             | singleton → `createAuth()` ファクトリー + `tanstackStartCookies` + Google OAuth |
+| `src/lib/auth/auth-client.ts` | `authClient` を named export に追加                                             |
+| `src/lib/drizzle/db.ts`       | placeholder → `getDb()` ヘルパー                                                |
+| `src/lib/drizzle/schema.ts`   | `images` テーブル追加                                                           |
+| `src/routes/__root.tsx`       | Header コンポーネント追加（認証 UI）                                            |
+| `src/routes/index.tsx`        | ギャラリー実装                                                                  |
 
 ## Cloudflare バインディング（wrangler.jsonc）
 
@@ -338,10 +338,8 @@ src/
 ```jsonc
 {
   "d1_databases": [
-    { "binding": "DB", "database_name": "tanstack-image-uploader", "database_id": "..." }
+    { "binding": "DB", "database_name": "tanstack-image-uploader", "database_id": "..." },
   ],
-  "r2_buckets": [
-    { "binding": "IMAGES_BUCKET", "bucket_name": "tanstack-image-uploader-images" }
-  ]
+  "r2_buckets": [{ "binding": "IMAGES_BUCKET", "bucket_name": "tanstack-image-uploader-images" }],
 }
 ```
