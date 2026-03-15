@@ -29,6 +29,7 @@ function Gallery() {
           <img
             src={`/api/images/${image.id}/file`}
             alt={image.filename}
+            loading="lazy"
             className="aspect-square w-full rounded-lg object-cover transition-opacity hover:opacity-90"
           />
         </Link>

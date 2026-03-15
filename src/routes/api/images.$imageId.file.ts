@@ -9,6 +9,10 @@ export const Route = createFileRoute("/api/images/$imageId/file")({
   server: {
     handlers: {
       GET: async ({ params }: { params: { imageId: string } }) => {
+        if (!params.imageId || typeof params.imageId !== "string") {
+          return new Response("Bad Request", { status: 400 });
+        }
+
         const db = getDb();
 
         const rows = await db

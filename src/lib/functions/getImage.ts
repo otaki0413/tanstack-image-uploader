@@ -10,7 +10,12 @@ export async function getImageHandler({ db, imageId }: { db: Database; imageId: 
 }
 
 export const getImage = createServerFn({ method: "GET" })
-  .inputValidator((data: { imageId: string }) => data)
+  .inputValidator((data: { imageId: string }) => {
+    if (!data.imageId || typeof data.imageId !== "string") {
+      throw new Error("imageId is required");
+    }
+    return data;
+  })
   .handler(async ({ data }) => {
     const db = getDb();
     return getImageHandler({ db, imageId: data.imageId });

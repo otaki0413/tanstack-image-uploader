@@ -1,5 +1,6 @@
 import { createServerFn } from "@tanstack/react-start";
 import { env } from "cloudflare:workers";
+import { eq } from "drizzle-orm";
 
 import { ensureSession } from "@/lib/auth.functions";
 import { getDb, type Database } from "@/lib/drizzle/db";
@@ -7,6 +8,13 @@ import { images } from "@/lib/drizzle/schema";
 
 const ALLOWED_TYPES = ["image/jpeg", "image/png", "image/webp", "image/gif"];
 const MAX_SIZE = 10 * 1024 * 1024;
+
+const MIME_TO_EXT: Record<string, string> = {
+  "image/jpeg": "jpg",
+  "image/png": "png",
+  "image/webp": "webp",
+  "image/gif": "gif",
+};
 
 export async function uploadImageHandler({
   db,
@@ -26,15 +34,11 @@ export async function uploadImageHandler({
     throw new Error("File too large");
   }
 
-  const ext = file.name.split(".").pop() ?? "bin";
+  const ext = MIME_TO_EXT[file.type] ?? "bin";
   const id = crypto.randomUUID();
   const r2Key = `images/${userId}/${id}.${ext}`;
 
-  const buffer = await file.arrayBuffer();
-  await bucket.put(r2Key, buffer, {
-    httpMetadata: { contentType: file.type },
-  });
-
+  // D1 を先に書く（R2 孤児よりゴーストレコードの方が安全）
   await db.insert(images).values({
     id,
     userId,
@@ -43,6 +47,17 @@ export async function uploadImageHandler({
     mimeType: file.type,
     size: file.size,
   });
+
+  try {
+    const buffer = await file.arrayBuffer();
+    await bucket.put(r2Key, buffer, {
+      httpMetadata: { contentType: file.type },
+    });
+  } catch (err) {
+    // D1 レコードをロールバック
+    await db.delete(images).where(eq(images.id, id));
+    throw err;
+  }
 
   return { id };
 }

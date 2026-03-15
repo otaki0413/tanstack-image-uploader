@@ -35,7 +35,12 @@ export async function deleteImageHandler({
 }
 
 export const deleteImage = createServerFn({ method: "POST" })
-  .inputValidator((data: { imageId: string }) => data)
+  .inputValidator((data: { imageId: string }) => {
+    if (!data.imageId || typeof data.imageId !== "string") {
+      throw new Error("imageId is required");
+    }
+    return data;
+  })
   .handler(async ({ data }) => {
     const session = await ensureSession();
     const db = getDb();

@@ -82,11 +82,11 @@ function NotFoundComponent() {
   );
 }
 
-function ErrorComponent({ error }: { error: Error }) {
+function ErrorComponent({ error }: { error: unknown }) {
   return (
     <div className="p-4">
       <h1 className="text-2xl font-bold text-red-600">エラー</h1>
-      <p>{error.message}</p>
+      <p>{error instanceof Error ? error.message : "予期しないエラーが発生しました"}</p>
     </div>
   );
 }
