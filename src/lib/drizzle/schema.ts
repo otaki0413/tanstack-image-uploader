@@ -69,7 +69,7 @@ export const images = sqliteTable(
     id,
     userId: text("user_id")
       .notNull()
-      .references(() => users.id),
+      .references(() => users.id, { onDelete: "cascade" }),
     r2Key: text("r2_key").notNull().unique(),
     filename: text("filename").notNull(),
     mimeType: text("mime_type").notNull(),
