@@ -85,11 +85,13 @@ export const images = sqliteTable(
     size: integer("size").notNull(),
     ...timestamps,
   },
-  (table) => [index("image_createdAt_idx").on(table.createdAt)],
+  (table) => [index("images_createdAt_idx").on(table.createdAt)],
 );
 ```
 
 マイグレーションは `drizzle-kit generate` で生成し、`wrangler d1 migrations apply` で適用。
+
+> **Note:** `timestamps` ヘルパーにより `updatedAt` カラムも自動付与される。画像はアップロード後に更新されないため `updatedAt` は実質未使用だが、既存ヘルパーとの一貫性を優先しそのまま含める。
 
 ### R2 キー構造
 
@@ -231,7 +233,7 @@ createServerFn wrapper
 
 | 関数 | ハンドラーの型 | 認証 |
 | --- | --- | --- |
-| `listImages` | `({ db }) => ImageRecord[]` | 不要 |
+| `listImages` | `({ db }) => ImageRecord[]`（最大 50 件、新着順） | 不要 |
 | `getImage` | `({ db, imageId }) => ImageRecord \| null` | 不要 |
 | `uploadImage` | `({ db, bucket, userId, file }) => { id }` | 必須 |
 | `deleteImage` | `({ db, bucket, userId, imageId }) => void` | 必須（所有者のみ） |
@@ -275,7 +277,7 @@ src/lib/functions/
 
 ### vitest 設定
 
-`vite-tsconfig-paths`（除去済み依存）を `resolve.alias` に置き換え。
+現在の `vitest.config.ts` は `resolve.tsconfigPaths: true` で `@/` エイリアスを解決しており、変更不要。
 
 ## セキュリティ考慮事項
 
@@ -328,7 +330,6 @@ src/
 | `src/lib/drizzle/schema.ts` | `images` テーブル追加 |
 | `src/routes/__root.tsx` | Header コンポーネント追加（認証 UI） |
 | `src/routes/index.tsx` | ギャラリー実装 |
-| `vitest.config.ts` | `vite-tsconfig-paths` → `resolve.alias` |
 
 ## Cloudflare バインディング（wrangler.jsonc）
 
