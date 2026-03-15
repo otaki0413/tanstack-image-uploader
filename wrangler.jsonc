@@ -5,7 +5,7 @@
 {
   "$schema": "node_modules/wrangler/config-schema.json",
   "name": "tanstack-cloudflare-template",
-  "compatibility_date": "2026-03-07",
+  "compatibility_date": "2026-03-15",
   "compatibility_flags": ["nodejs_compat"],
   "main": "@tanstack/react-start/server-entry",
   "observability": {
@@ -22,6 +22,19 @@
    * databases, object storage, AI inference, real-time communication and more.
    * https://developers.cloudflare.com/workers/runtime-apis/bindings/
    */
+  "d1_databases": [
+    {
+      "binding": "DB",
+      "database_name": "tanstack-image-uploader",
+      "database_id": "7b26f3a3-c486-415e-a4ec-ba4e0447a5f7",
+    },
+  ],
+  "r2_buckets": [
+    {
+      "bucket_name": "tanstack-image-uploader-images",
+      "binding": "IMAGES_BUCKET",
+    },
+  ],
   /**
    * Environment Variables
    * https://developers.cloudflare.com/workers/wrangler/configuration/#environment-variables
