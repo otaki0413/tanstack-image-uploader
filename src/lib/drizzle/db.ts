@@ -1,5 +1,10 @@
+import { env } from "cloudflare:workers";
 import { drizzle } from "drizzle-orm/d1";
 
-// Placeholder for CLI compatibility.
-// In production, the D1 binding is provided by Cloudflare Workers runtime.
-export const db = drizzle(undefined as unknown as D1Database);
+import * as schema from "./schema";
+
+export function getDb() {
+  return drizzle(env.DB, { schema });
+}
+
+export type Database = ReturnType<typeof getDb>;

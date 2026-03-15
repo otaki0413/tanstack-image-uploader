@@ -9,38 +9,101 @@
 // Additionally, you should also exclude this file from your linter and/or formatter to prevent it from being checked or modified.
 
 import { Route as rootRouteImport } from './routes/__root'
+import { Route as UploadRouteImport } from './routes/upload'
 import { Route as IndexRouteImport } from './routes/index'
+import { Route as ImagesImageIdRouteImport } from './routes/images/$imageId'
+import { Route as ApiAuthSplatRouteImport } from './routes/api/auth.$'
+import { Route as ApiImagesImageIdFileRouteImport } from './routes/api/images.$imageId.file'
 
+const UploadRoute = UploadRouteImport.update({
+  id: '/upload',
+  path: '/upload',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const IndexRoute = IndexRouteImport.update({
   id: '/',
   path: '/',
   getParentRoute: () => rootRouteImport,
 } as any)
+const ImagesImageIdRoute = ImagesImageIdRouteImport.update({
+  id: '/images/$imageId',
+  path: '/images/$imageId',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ApiAuthSplatRoute = ApiAuthSplatRouteImport.update({
+  id: '/api/auth/$',
+  path: '/api/auth/$',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ApiImagesImageIdFileRoute = ApiImagesImageIdFileRouteImport.update({
+  id: '/api/images/$imageId/file',
+  path: '/api/images/$imageId/file',
+  getParentRoute: () => rootRouteImport,
+} as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
+  '/upload': typeof UploadRoute
+  '/images/$imageId': typeof ImagesImageIdRoute
+  '/api/auth/$': typeof ApiAuthSplatRoute
+  '/api/images/$imageId/file': typeof ApiImagesImageIdFileRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
+  '/upload': typeof UploadRoute
+  '/images/$imageId': typeof ImagesImageIdRoute
+  '/api/auth/$': typeof ApiAuthSplatRoute
+  '/api/images/$imageId/file': typeof ApiImagesImageIdFileRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
+  '/upload': typeof UploadRoute
+  '/images/$imageId': typeof ImagesImageIdRoute
+  '/api/auth/$': typeof ApiAuthSplatRoute
+  '/api/images/$imageId/file': typeof ApiImagesImageIdFileRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/'
+  fullPaths:
+    | '/'
+    | '/upload'
+    | '/images/$imageId'
+    | '/api/auth/$'
+    | '/api/images/$imageId/file'
   fileRoutesByTo: FileRoutesByTo
-  to: '/'
-  id: '__root__' | '/'
+  to:
+    | '/'
+    | '/upload'
+    | '/images/$imageId'
+    | '/api/auth/$'
+    | '/api/images/$imageId/file'
+  id:
+    | '__root__'
+    | '/'
+    | '/upload'
+    | '/images/$imageId'
+    | '/api/auth/$'
+    | '/api/images/$imageId/file'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
+  UploadRoute: typeof UploadRoute
+  ImagesImageIdRoute: typeof ImagesImageIdRoute
+  ApiAuthSplatRoute: typeof ApiAuthSplatRoute
+  ApiImagesImageIdFileRoute: typeof ApiImagesImageIdFileRoute
 }
 
 declare module '@tanstack/react-router' {
   interface FileRoutesByPath {
+    '/upload': {
+      id: '/upload'
+      path: '/upload'
+      fullPath: '/upload'
+      preLoaderRoute: typeof UploadRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/': {
       id: '/'
       path: '/'
@@ -48,11 +111,36 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof IndexRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/images/$imageId': {
+      id: '/images/$imageId'
+      path: '/images/$imageId'
+      fullPath: '/images/$imageId'
+      preLoaderRoute: typeof ImagesImageIdRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/api/auth/$': {
+      id: '/api/auth/$'
+      path: '/api/auth/$'
+      fullPath: '/api/auth/$'
+      preLoaderRoute: typeof ApiAuthSplatRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/api/images/$imageId/file': {
+      id: '/api/images/$imageId/file'
+      path: '/api/images/$imageId/file'
+      fullPath: '/api/images/$imageId/file'
+      preLoaderRoute: typeof ApiImagesImageIdFileRouteImport
+      parentRoute: typeof rootRouteImport
+    }
   }
 }
 
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
+  UploadRoute: UploadRoute,
+  ImagesImageIdRoute: ImagesImageIdRoute,
+  ApiAuthSplatRoute: ApiAuthSplatRoute,
+  ApiImagesImageIdFileRoute: ApiImagesImageIdFileRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)

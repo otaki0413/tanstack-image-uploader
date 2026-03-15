@@ -62,3 +62,19 @@ export const verifications = sqliteTable(
   },
   (table) => [index("verification_identifier_idx").on(table.identifier)],
 );
+
+export const images = sqliteTable(
+  "images",
+  {
+    id,
+    userId: text("user_id")
+      .notNull()
+      .references(() => users.id, { onDelete: "cascade" }),
+    r2Key: text("r2_key").notNull().unique(),
+    filename: text("filename").notNull(),
+    mimeType: text("mime_type").notNull(),
+    size: integer("size").notNull(),
+    ...timestamps,
+  },
+  (table) => [index("images_createdAt_idx").on(table.createdAt)],
+);

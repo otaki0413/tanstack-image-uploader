@@ -1,7 +1,7 @@
 import { defineConfig } from "oxfmt";
 
 export default defineConfig({
-  ignorePatterns: ["**/routeTree.gen.ts", "**/drizzle/migrations/**"],
+  ignorePatterns: ["**/routeTree.gen.ts", "**/drizzle/migrations/**", "worker-configuration.d.ts"],
   sortImports: {
     groups: [
       ["side_effect"],

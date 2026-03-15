@@ -8,6 +8,20 @@
       "when": 1773548920609,
       "tag": "0000_deep_ricochet",
       "breakpoints": true
+    },
+    {
+      "idx": 1,
+      "version": "6",
+      "when": 1773566343277,
+      "tag": "0001_mixed_pet_avengers",
+      "breakpoints": true
+    },
+    {
+      "idx": 2,
+      "version": "6",
+      "when": 1773566847292,
+      "tag": "0002_round_doorman",
+      "breakpoints": true
     }
   ]
 }
