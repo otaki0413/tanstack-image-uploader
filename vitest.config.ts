@@ -5,6 +5,9 @@ export default defineConfig({
   plugins: [viteReact()],
   resolve: {
     tsconfigPaths: true,
+    alias: {
+      "cloudflare:workers": new URL("./src/test/mocks/cloudflare.ts", import.meta.url).pathname,
+    },
   },
   test: {
     environment: "jsdom",
