@@ -1,4 +1,5 @@
 import { createServerFn } from "@tanstack/react-start";
+import { env } from "cloudflare:workers";
 import { eq } from "drizzle-orm";
 
 import { ensureSession } from "@/lib/auth.functions";
@@ -38,11 +39,10 @@ export const deleteImage = createServerFn({ method: "POST" })
   .handler(async ({ data }) => {
     const session = await ensureSession();
     const db = getDb();
-    // R2 bucket is not accessible from server functions directly; only from API routes
-    // Perform DB-only deletion and return for now; R2 cleanup handled separately
-    const rows = await db.select().from(images).where(eq(images.id, data.imageId));
-    const image = rows[0];
-    if (!image) throw new Error("Not found");
-    if (image.userId !== session.user.id) throw new Error("Forbidden");
-    await db.delete(images).where(eq(images.id, image.id));
+    return deleteImageHandler({
+      db,
+      bucket: env.IMAGES_BUCKET,
+      userId: session.user.id,
+      imageId: data.imageId,
+    });
   });

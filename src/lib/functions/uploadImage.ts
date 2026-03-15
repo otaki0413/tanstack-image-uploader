@@ -1,4 +1,5 @@
 import { createServerFn } from "@tanstack/react-start";
+import { env } from "cloudflare:workers";
 
 import { ensureSession } from "@/lib/auth.functions";
 import { getDb, type Database } from "@/lib/drizzle/db";
@@ -50,26 +51,13 @@ export const uploadImage = createServerFn({ method: "POST" })
   .inputValidator((data: FormData) => data)
   .handler(async ({ data }) => {
     const session = await ensureSession();
+    const db = getDb();
     const file = data.get("file");
     if (!(file instanceof File)) throw new Error("No file provided");
-    // R2 bucket is not accessible from server functions directly;
-    // DB-only record creation — actual upload handled via API route
-    const db = getDb();
-    if (!ALLOWED_TYPES.includes(file.type)) throw new Error("Invalid file type");
-    if (file.size > MAX_SIZE) throw new Error("File too large");
-
-    const ext = file.name.split(".").pop() ?? "bin";
-    const id = crypto.randomUUID();
-    const r2Key = `images/${session.user.id}/${id}.${ext}`;
-
-    await db.insert(images).values({
-      id,
+    return uploadImageHandler({
+      db,
+      bucket: env.IMAGES_BUCKET,
       userId: session.user.id,
-      r2Key,
-      filename: file.name,
-      mimeType: file.type,
-      size: file.size,
+      file,
     });
-
-    return { id };
   });
