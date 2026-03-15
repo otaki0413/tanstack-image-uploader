@@ -5,7 +5,7 @@
 {
   "$schema": "node_modules/wrangler/config-schema.json",
   "name": "tanstack-cloudflare-template",
-  "compatibility_date": "2026-03-15",
+  "compatibility_date": "2026-03-10",
   "compatibility_flags": ["nodejs_compat"],
   "main": "@tanstack/react-start/server-entry",
   "observability": {
@@ -27,6 +27,7 @@
       "binding": "DB",
       "database_name": "tanstack-image-uploader",
       "database_id": "7b26f3a3-c486-415e-a4ec-ba4e0447a5f7",
+      "migrations_dir": "./src/lib/drizzle/migrations",
     },
   ],
   "r2_buckets": [
