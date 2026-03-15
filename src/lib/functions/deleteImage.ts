@@ -33,12 +33,16 @@ export async function deleteImageHandler({
   }
 }
 
-export const deleteImage = createServerFn({ method: "POST" }).handler(async () => {
-  const session = await ensureSession();
-  const db = getDb();
-  // This handler will be called from API routes that pass imageId from the request body
-  // For now, returning null as a placeholder
-  void session;
-  void db;
-  return null;
-});
+export const deleteImage = createServerFn({ method: "POST" })
+  .inputValidator((data: { imageId: string }) => data)
+  .handler(async ({ data }) => {
+    const session = await ensureSession();
+    const db = getDb();
+    // R2 bucket is not accessible from server functions directly; only from API routes
+    // Perform DB-only deletion and return for now; R2 cleanup handled separately
+    const rows = await db.select().from(images).where(eq(images.id, data.imageId));
+    const image = rows[0];
+    if (!image) throw new Error("Not found");
+    if (image.userId !== session.user.id) throw new Error("Forbidden");
+    await db.delete(images).where(eq(images.id, image.id));
+  });
