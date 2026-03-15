@@ -46,14 +46,30 @@ export async function uploadImageHandler({
   return { id };
 }
 
-// Server function wrapper - file will be passed as FormData from the route handler
-// The API route handler will call this with the file from the request
-export const uploadImage = createServerFn({ method: "POST" }).handler(async () => {
-  const session = await ensureSession();
-  const db = getDb();
-  // This handler will be called from API routes that pass file data
-  // For now, returning null as a placeholder
-  void session;
-  void db;
-  return null;
-});
+export const uploadImage = createServerFn({ method: "POST" })
+  .inputValidator((data: FormData) => data)
+  .handler(async ({ data }) => {
+    const session = await ensureSession();
+    const file = data.get("file");
+    if (!(file instanceof File)) throw new Error("No file provided");
+    // R2 bucket is not accessible from server functions directly;
+    // DB-only record creation — actual upload handled via API route
+    const db = getDb();
+    if (!ALLOWED_TYPES.includes(file.type)) throw new Error("Invalid file type");
+    if (file.size > MAX_SIZE) throw new Error("File too large");
+
+    const ext = file.name.split(".").pop() ?? "bin";
+    const id = crypto.randomUUID();
+    const r2Key = `images/${session.user.id}/${id}.${ext}`;
+
+    await db.insert(images).values({
+      id,
+      userId: session.user.id,
+      r2Key,
+      filename: file.name,
+      mimeType: file.type,
+      size: file.size,
+    });
+
+    return { id };
+  });
