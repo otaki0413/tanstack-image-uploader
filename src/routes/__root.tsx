@@ -34,6 +34,9 @@ function Header() {
             <Link to="/upload" className="hover:underline">
               Upload
             </Link>
+            <Link to="/profile" className="hover:underline">
+              Profile
+            </Link>
             <span className="text-gray-600">{session.user.name}</span>
             <button
               type="button"

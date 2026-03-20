@@ -76,5 +76,8 @@ export const images = sqliteTable(
     size: integer("size").notNull(),
     ...timestamps,
   },
-  (table) => [index("images_createdAt_idx").on(table.createdAt)],
+  (table) => [
+    index("images_createdAt_idx").on(table.createdAt),
+    index("images_userId_createdAt_idx").on(table.userId, table.createdAt),
+  ],
 );

@@ -1,14 +1,11 @@
-import { createFileRoute, redirect, useRouter } from "@tanstack/react-router";
+import { createFileRoute, useRouter } from "@tanstack/react-router";
 import { useState } from "react";
 
-import { getSession } from "@/lib/auth.functions";
+import { requireAuth } from "@/lib/auth.functions";
 import { uploadImage } from "@/lib/functions/uploadImage";
 
 export const Route = createFileRoute("/upload")({
-  beforeLoad: async () => {
-    const session = await getSession();
-    if (!session) throw redirect({ to: "/" });
-  },
+  beforeLoad: requireAuth,
   component: UploadPage,
 });
 

@@ -10,6 +10,7 @@
 
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as UploadRouteImport } from './routes/upload'
+import { Route as ProfileRouteImport } from './routes/profile'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as ImagesImageIdRouteImport } from './routes/images/$imageId'
 import { Route as ApiAuthSplatRouteImport } from './routes/api/auth.$'
@@ -18,6 +19,11 @@ import { Route as ApiImagesImageIdFileRouteImport } from './routes/api/images.$i
 const UploadRoute = UploadRouteImport.update({
   id: '/upload',
   path: '/upload',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ProfileRoute = ProfileRouteImport.update({
+  id: '/profile',
+  path: '/profile',
   getParentRoute: () => rootRouteImport,
 } as any)
 const IndexRoute = IndexRouteImport.update({
@@ -43,6 +49,7 @@ const ApiImagesImageIdFileRoute = ApiImagesImageIdFileRouteImport.update({
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
+  '/profile': typeof ProfileRoute
   '/upload': typeof UploadRoute
   '/images/$imageId': typeof ImagesImageIdRoute
   '/api/auth/$': typeof ApiAuthSplatRoute
@@ -50,6 +57,7 @@ export interface FileRoutesByFullPath {
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
+  '/profile': typeof ProfileRoute
   '/upload': typeof UploadRoute
   '/images/$imageId': typeof ImagesImageIdRoute
   '/api/auth/$': typeof ApiAuthSplatRoute
@@ -58,6 +66,7 @@ export interface FileRoutesByTo {
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
+  '/profile': typeof ProfileRoute
   '/upload': typeof UploadRoute
   '/images/$imageId': typeof ImagesImageIdRoute
   '/api/auth/$': typeof ApiAuthSplatRoute
@@ -67,6 +76,7 @@ export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
   fullPaths:
     | '/'
+    | '/profile'
     | '/upload'
     | '/images/$imageId'
     | '/api/auth/$'
@@ -74,6 +84,7 @@ export interface FileRouteTypes {
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
+    | '/profile'
     | '/upload'
     | '/images/$imageId'
     | '/api/auth/$'
@@ -81,6 +92,7 @@ export interface FileRouteTypes {
   id:
     | '__root__'
     | '/'
+    | '/profile'
     | '/upload'
     | '/images/$imageId'
     | '/api/auth/$'
@@ -89,6 +101,7 @@ export interface FileRouteTypes {
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
+  ProfileRoute: typeof ProfileRoute
   UploadRoute: typeof UploadRoute
   ImagesImageIdRoute: typeof ImagesImageIdRoute
   ApiAuthSplatRoute: typeof ApiAuthSplatRoute
@@ -102,6 +115,13 @@ declare module '@tanstack/react-router' {
       path: '/upload'
       fullPath: '/upload'
       preLoaderRoute: typeof UploadRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/profile': {
+      id: '/profile'
+      path: '/profile'
+      fullPath: '/profile'
+      preLoaderRoute: typeof ProfileRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/': {
@@ -137,6 +157,7 @@ declare module '@tanstack/react-router' {
 
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
+  ProfileRoute: ProfileRoute,
   UploadRoute: UploadRoute,
   ImagesImageIdRoute: ImagesImageIdRoute,
   ApiAuthSplatRoute: ApiAuthSplatRoute,

@@ -1,0 +1,1 @@
+CREATE INDEX `images_userId_createdAt_idx` ON `images` (`user_id`,`created_at`);
